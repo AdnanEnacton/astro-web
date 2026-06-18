@@ -3,5 +3,5 @@ publish = "dist"
 command = 'NODE_OPTIONS="--max-old-space-size=4096" yarn tinacms build && yarn astro build'
 
 [build.environment]
-NODE_VERSION = "20"
+NODE_VERSION = "22"
 NODE_OPTIONS = "--max-old-space-size=4096"
