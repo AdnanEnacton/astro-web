@@ -1,0 +1,250 @@
+---
+import Base from "@/layouts/Base.astro";
+import { getSinglePage } from "@/lib/contentParser.astro";
+import AboutBanner from "@/partials/AboutBanner.astro";
+import CallToAction from "@/partials/CallToAction.astro";
+import Clients from "@/partials/Clients.astro";
+import Faq from "@/partials/Faq.astro";
+import OurTeam from "@/partials/OurTeam.astro";
+import OurValues from "@/partials/OurValues.astro";
+import HowItWorks from "@/partials/HowItWorks.astro";
+import FeaturesGrid from "@/partials/FeaturesGrid.astro";
+import FeatureSection from "@/partials/FeatureSection.astro";
+import FeaturesExplanation from "@/partials/FeaturesExplanation.astro";
+import PricingSection from "@/partials/PricingSection.astro";
+import Testimonial from "@/partials/Testimonial.astro";
+import ContactHero from "@/partials/ContactHero.astro";
+import PageHeader from "@/partials/PageHeader.astro";
+import BlogSection from "@/partials/BlogSection.astro";
+import Pagination from "@/components/Pagination.astro";
+import config from "@/config/config.json";
+import { useTranslations } from "@/i18n/ui";
+import { render } from "astro:content";
+import dayjs from "dayjs";
+
+export async function getStaticPaths() {
+  const homepage = await getSinglePage("homepage");
+  const about = await getSinglePage("about");
+  const contact = await getSinglePage("contact");
+  const pricing = await getSinglePage("pricing");
+  const features = await getSinglePage("features");
+  const pages = await getSinglePage("pages");
+  const blogPage = await getSinglePage("blogPage");
+
+  const collections = [
+    { type: "homepage", entries: homepage },
+    { type: "about", entries: about },
+    { type: "contact", entries: contact },
+    { type: "pricing", entries: pricing },
+    { type: "features", entries: features },
+    { type: "pages", entries: pages },
+    { type: "blogPage", entries: blogPage },
+  ];
+
+  const paths = collections.flatMap(({ type, entries }) => {
+    return entries.map((entry) => {
+      const [locale, ...nameParts] = entry.id.split("/");
+      const name = nameParts.join("/");
+
+      let slug: string | undefined;
+      if (locale === "de") {
+        slug = name === "home" ? undefined : name;
+      } else {
+        slug = name === "home" ? locale : `${locale}/${name}`;
+      }
+
+      return {
+        params: { slug },
+        props: { page: entry, type, locale },
+      };
+    });
+  });
+
+  return paths;
+}
+
+const { page, type, locale } = Astro.props;
+const data = page.data as any;
+
+// Page rendering helpers for regular markdown pages
+let Content = null;
+let lastModified = "";
+
+if (type === "pages") {
+  const rendered = await render(page);
+  Content = rendered.Content;
+  lastModified = dayjs(rendered.remarkPluginFrontmatter.lastModified).format(
+    "MMMM DD, YYYY"
+  );
+}
+
+// Blog posts loading (only if blog_section or pagination is configured)
+let posts: any[] = [];
+let totalPages = 0;
+const hasBlogSection = data.blog_section || data.pagination || 
+  (data.sections && data.sections.some((s: any) => s.type === "blog_section" || s.type === "pagination"));
+
+if (hasBlogSection) {
+  posts = (await getSinglePage("blog")).filter((post) =>
+    post.id.startsWith(locale + "/")
+  );
+  totalPages = Math.ceil(posts.length / config.settings.pagination);
+}
+
+// Homepage-specific variables
+let bannerSection = null;
+let homeSchema = undefined;
+
+if (data.sections) {
+  bannerSection = data.sections.find((s: any) => s.type === "banner");
+}
+
+if (!bannerSection && type === "homepage") {
+  bannerSection = data.banner;
+}
+
+if (type === "homepage") {
+  const t = useTranslations(locale as any);
+  homeSchema = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": config.site.title,
+      "url": config.site.base_url
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": config.site.title,
+      "url": config.site.base_url,
+      "logo": `${config.site.base_url}${config.site.logo}`,
+      "description": t("footer.description")
+    }
+  ];
+}
+---
+
+<Base
+  title={data.title}
+  meta_title={data.meta_title}
+  description={data.description}
+  image={data.image}
+  keywords={data.keywords}
+  banner={bannerSection ? bannerSection.enable !== false : undefined}
+  bannerData={bannerSection}
+  schema={type === "homepage" ? homeSchema : undefined}
+>
+  {/* Render standard generic markdown page */}
+  {type === "pages" ? (
+    <>
+      <PageHeader title={data.title} lastModified={lastModified} />
+      <section class="section">
+        <div class="container" data-aos="fade-up-sm" data-aos-delay={200}>
+          <div class="row justify-center">
+            <div class="lg:col-10">
+              <div class="content">
+                {Content && <Content />}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <CallToAction />
+    </>
+  ) : (
+    /* Render modular section list */
+    data.sections &&
+    data.sections.map((section: any) => {
+      if (section.enable === false) return null;
+
+      return (
+        <>
+          {/* Banner Section (Handled by Layout Header, return null in body) */}
+          {section.type === "banner" && null}
+
+          {/* About Banner Section */}
+          {section.type === "about_banner" && (
+            <AboutBanner content={section} />
+          )}
+
+          {/* Contact Hero Section */}
+          {section.type === "contact_hero" && (
+            <ContactHero content={section} />
+          )}
+
+          {/* Clients Section */}
+          {section.type === "clients" && (
+            <Clients content={section} />
+          )}
+
+          {/* Our Values Section */}
+          {section.type === "our_values" && (
+            <OurValues content={section} />
+          )}
+
+          {/* Our Team Section */}
+          {section.type === "our_team" && (
+            <OurTeam content={section} />
+          )}
+
+          {/* How It Works Section */}
+          {section.type === "how_it_works" && (
+            <HowItWorks content={section} />
+          )}
+
+          {/* Features Grid Section */}
+          {section.type === "features_grid" && (
+            <FeaturesGrid content={section} largeHeading={type === "features"} />
+          )}
+
+          {/* Features Section */}
+          {section.type === "features_section" && (
+            <FeatureSection content={section} />
+          )}
+
+          {/* Features Explanation Section */}
+          {section.type === "features_explanation" && (
+            <FeaturesExplanation content={section} />
+          )}
+
+          {/* Pricing Section */}
+          {section.type === "pricing" && (
+            <PricingSection content={section} largeHeading={type === "pricing"} />
+          )}
+
+          {/* Testimonial Section */}
+          {section.type === "testimonial" && (
+            <Testimonial content={section} visible_testimonial={3} />
+          )}
+
+          {/* Blog Section */}
+          {section.type === "blog_section" && (
+            <BlogSection
+              largeHeading={section.large_heading}
+              content={section}
+              visiblePosts={section.visible_posts}
+              cardLayout={section.card_layout}
+              posts={posts}
+            />
+          )}
+
+          {/* Pagination */}
+          {section.type === "pagination" && (
+            <Pagination section="blog" totalPages={totalPages} />
+          )}
+
+          {/* FAQ Section */}
+          {section.type === "faq" && (
+            <Faq content={section} />
+          )}
+
+          {/* CTA Section */}
+          {section.type === "page_cta" && (
+            <CallToAction content={section} />
+          )}
+        </>
+      );
+    })
+  )}
+
+</Base>

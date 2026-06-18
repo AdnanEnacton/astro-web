@@ -9,6 +9,7 @@ const commonFields = {
   date: z.coerce.date().optional(),
   image: z.string().optional(),
   draft: z.boolean(),
+  sections: z.array(z.any()).optional(),
 };
 
 export const pages = defineCollection({
@@ -364,6 +365,7 @@ export const homepage = defineCollection({
     meta_title: z.string().optional(),
     keywords: z.string().optional(),
     draft: z.boolean(),
+    sections: z.array(z.any()).optional(),
     banner: bannerSchema.optional(),
     clients: clientsSchema.optional(),
     how_it_works: howItWorksSchema.optional(),

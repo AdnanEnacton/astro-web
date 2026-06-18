@@ -9,17 +9,6 @@ const { hideHeadingBar, content } = Astro.props;
 
 let sectionData;
 if (content) {
-  let list = content.list || [];
-  if (content.rows) {
-    list = [
-      {
-        row: content.rows?.map((r: any) => ({
-          title: r.title,
-          description: `**Traditional:** ${r.old_val} <br/><span class="text-tertiary">**Proposal.biz:** ${r.new_val}</span>`
-        })) || []
-      }
-    ];
-  }
   sectionData = {
     data: {
       enable: content.enable !== false,
@@ -27,7 +16,7 @@ if (content) {
       subtitle: content.subtitle || "",
       description: content.description || "",
       image: content.image || "/images/features/features-explanation.png",
-      list,
+      list: content.list || [],
     }
   };
 } else {
