@@ -1,0 +1,42 @@
+{
+  "site": {
+    "title": "Pontora",
+    "base_url": "https://pontora-marketing-website.pages.dev",
+    "base_path": "/",
+    "trailing_slash": true,
+    "favicon": "/images/favicon.png",
+    "logo": "/images/logo.png",
+    "logo_width": "134",
+    "logo_height": "47",
+    "logo_text": "Pontora"
+  },
+  "settings": {
+    "pagination": 3,
+    "summary_length": 120,
+    "blog_folder": "blog"
+  },
+  "params": {
+    "contact_form_action": "https://devadmin.pontora.ch/api/contact-submission",
+    "footer_description": "Pontora is a multi-tenant operations platform for trustee firms, companies, site managers, and employees to manage workforce administration, documents, tasks, approvals, timesheets, receipts, and daily business operations.",
+    "copyright": "Copyright © {year} Pontora. All Rights Reserved"
+  },
+  "google_tag_manager": {
+    "enable": false,
+    "gtm_id": "GTM-XXXXXX"
+  },
+  "navigation_buttons": {
+    "dashboard": {
+      "label": "Dashboard",
+      "link": "https://app.pontora.ch/company/dashboard"
+    },
+    "login": {
+      "label": "Login",
+      "link": "https://app.pontora.ch/"
+    }
+  },
+  "metadata": {
+    "meta_author": "Pontora",
+    "meta_image": "/images/og-image.png",
+    "meta_description": "Pontora is a secure role-based operations platform that connects companies, employees, site managers, and trustee firms through shared workflows for workforce administration, digital documents, tasks, approvals, timesheets, receipts, restaurant/gastro daily operations, and multi-location administration."
+  }
+}

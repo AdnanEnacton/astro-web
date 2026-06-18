@@ -1,0 +1,318 @@
+---
+import ImageMod from "@/components/ImageMod.astro";
+const locale = Astro.currentLocale || "de";
+import { getListPage } from "@/lib/contentParser.astro";
+import { markdownify } from "@/lib/utils/textConverter";
+import { useTranslations } from "@/i18n/ui";
+
+const contact_form_action = import.meta.env.PUBLIC_PONTORA_API_URL + "/api/contact-submission";
+// reCAPTCHA v3 site key — public key, safe to embed. Falls back to env var if set.
+const recaptchaSiteKey = import.meta.env.PUBLIC_RECAPTCHA_SITE_KEY || "6Lei1yEtAAAAADxPPV0Ia01VolVebVvc6p13rAme";
+
+const { content } = Astro.props;
+
+let hero;
+if (content) {
+  hero = content;
+} else {
+  const contactIndex = await getListPage("contact", `${locale}/-index`);
+  if (contactIndex.data.draft) {
+    return Astro.redirect("/404");
+  }
+  hero = contactIndex.data.contact_hero;
+}
+if (!hero) {
+  return null;
+}
+
+const t = useTranslations(locale);
+
+const translations = {
+  sending: t("contact.sending"),
+  sendMessage: t("contact.send_message"),
+  errorFallback: t("contact.error_fallback"),
+  errorNetwork: t("contact.error_network"),
+  errorMinLength: t("contact.error_min_length"),
+};
+---
+
+<section class="section">
+  <div class="container">
+    <div class="row">
+      <div class="lg:col-6 lg:pe-6 lg:pt-16" data-aos="fade-left-sm">
+        {
+          hero.subtitle && (
+            <p
+              class="mb-2 font-medium text-tertiary"
+              set:html={markdownify(hero.subtitle)}
+            />
+          )
+        }
+        {
+          hero.title && (
+            <h2 class="md:h1 mb-6" set:html={markdownify(hero.title)} />
+          )
+        }
+        {
+          hero.description && (
+            <p
+              class="text-lg/[inherit]"
+              set:html={markdownify(hero.description)}
+            />
+          )
+        }
+        {
+          hero.list && (
+            <div class="mt-10 flex flex-col gap-10 sm:flex-row xl:mt-20">
+              {hero.list.map((point: any) => (
+                <div>
+                  {point.icon && (
+                    <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-tertiary">
+                      <ImageMod
+                        class="h-6 w-6 object-cover"
+                        src={point.icon}
+                        alt={`icon related to ${point.title}`}
+                        title={`icon related to ${point.title}`}
+                      />
+                    </div>
+                  )}
+                  {point.title && (
+                    <h3
+                      class="h6 mb-2 mt-5"
+                      set:html={markdownify(point.title)}
+                    />
+                  )}
+                  {point.description && (
+                    <p
+                      class="text-lg/[inherit]"
+                      set:html={markdownify(point.description)}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          )
+        }
+      </div>
+      <div
+        class="relative pt-24 lg:col-6 lg:pt-16"
+        data-aos="fade-left-sm"
+        data-aos-delay="200">
+        <div class="mb-4 flex items-center justify-center">
+          <ImageMod
+            class="w-auto h-12"
+            src={"/images/logo.png"}
+            alt="hero image"
+            title="hero image"
+            loading="eager"
+          />
+        </div>
+        <div class="rounded-2xl bg-light p-5 md:p-10">
+          <div id="contact-success" class="hidden rounded-lg bg-green-50 border border-green-200 p-6 text-center">
+            <p class="font-semibold text-green-800">{t("contact.success_title")}</p>
+            <p class="mt-1 text-sm text-green-700">{t("contact.success_subtitle")}</p>
+          </div>
+          <div id="contact-error" class="hidden rounded-lg bg-red-50 border border-red-200 p-4 mb-4">
+            <p id="contact-error-msg" class="text-sm text-red-700"></p>
+          </div>
+          <form id="contact-form" class="row g-4">
+            <!-- Honeypot: hidden from humans via CSS, bots fill it -->
+            <div style="position:absolute;left:-9999px;top:-9999px;opacity:0;pointer-events:none;" aria-hidden="true">
+              <label for="website">Website</label>
+              <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" />
+            </div>
+            <div class="lg:col-6">
+              <label for="name" class="form-label">
+                {t("contact.name_label")} <span class="text-red-500">*</span>
+              </label>
+              <input
+                id="name"
+                name="name"
+                class="form-input"
+                placeholder={t("contact.name_placeholder")}
+                required
+                type="text"
+              />
+            </div>
+            <div class="lg:col-6">
+              <label for="company" class="form-label">{t("contact.company_label")}</label>
+              <input
+                id="company"
+                name="company"
+                class="form-input"
+                placeholder={t("contact.company_placeholder")}
+                type="text"
+              />
+            </div>
+            <div class="lg:col-6">
+              <label for="email" class="form-label">
+                {t("contact.email_label")} <span class="text-red-500">*</span>
+              </label>
+              <input
+                id="email"
+                name="email"
+                class="form-input"
+                placeholder={t("contact.email_placeholder")}
+                required
+                type="email"
+              />
+            </div>
+            <div class="lg:col-6">
+              <label for="phone" class="form-label">{t("contact.phone_label")}</label>
+              <input
+                id="phone"
+                name="phone"
+                class="form-input"
+                placeholder={t("contact.phone_placeholder")}
+                type="tel"
+              />
+            </div>
+            <div class="col-12">
+              <label for="subject" class="form-label">
+                {t("contact.subject_label")} <span class="text-red-500">*</span>
+              </label>
+              <select
+                id="subject"
+                name="subject"
+                class="form-input bg-white"
+                required>
+                <option value="" disabled selected>{t("contact.subject_placeholder")}</option>
+                <option value="Accounting & Bookkeeping">
+                  {t("contact.subject.accounting")}
+                </option>
+                <option value="Payroll & HR">{t("contact.subject.payroll")}</option>
+                <option value="Tax & VAT Services">{t("contact.subject.tax")}</option>
+                <option value="Business Consulting">{t("contact.subject.consulting")}</option>
+                <option value="MyHDF Portal">{t("contact.subject.portal")}</option>
+                <option value="Other Inquiry">{t("contact.subject.other")}</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label for="message" class="form-label">
+                {t("contact.message_label")} <span class="text-red-500">*</span>
+              </label>
+              <textarea
+                id="message"
+                name="message"
+                class="form-input"
+                placeholder={t("contact.message_placeholder")}
+                required
+                minlength="10"
+                rows="4"></textarea>
+            </div>
+            <div class="col-12">
+              <p class="text-sm text-text-dark/60">
+                <span class="text-red-500">*</span> {t("contact.required_fields")}
+              </p>
+            </div>
+            <div class="col-12">
+              <button id="contact-submit" type="submit" class="btn btn-regular">
+                {t("contact.send_message")}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src={`https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}`} async></script>
+
+<script define:vars={{ contact_form_action, locale, recaptchaSiteKey, translations }}>
+  const form = document.getElementById("contact-form");
+  const submitBtn = document.getElementById("contact-submit");
+  const successEl = document.getElementById("contact-success");
+  const errorEl = document.getElementById("contact-error");
+  const errorMsg = document.getElementById("contact-error-msg");
+
+  // Load reCAPTCHA v3 script dynamically
+  if (recaptchaSiteKey) {
+    const script = document.createElement("script");
+    script.src = `https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}`;
+    script.async = true;
+    document.head.appendChild(script);
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    // Honeypot check — if filled, silently succeed (fool bot)
+    const honeypot = form.elements.namedItem("website");
+    if (honeypot && honeypot.value) {
+      form.classList.add("hidden");
+      successEl.classList.remove("hidden");
+      return;
+    }
+
+    const els = form.elements;
+    const messageVal = els.namedItem("message").value.trim();
+    if (messageVal.length < 10) {
+      errorMsg.textContent = translations.errorMinLength;
+      errorEl.classList.remove("hidden");
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = translations.sending;
+    errorEl.classList.add("hidden");
+
+    const data = {
+      name: els.namedItem("name").value.trim(),
+      email: els.namedItem("email").value.trim(),
+      company: els.namedItem("company").value.trim() || undefined,
+      phone: els.namedItem("phone").value.trim() || undefined,
+      subject: els.namedItem("subject").value,
+      message: els.namedItem("message").value.trim(),
+      locale,
+    };
+
+    // Get reCAPTCHA v3 token
+    if (recaptchaSiteKey && typeof grecaptcha !== "undefined") {
+      try {
+        data.recaptchaToken = await new Promise((resolve) => {
+          grecaptcha.ready(() => {
+            grecaptcha.execute(recaptchaSiteKey, { action: "contact" }).then(resolve);
+          });
+        });
+      } catch {
+        // proceed without token if reCAPTCHA fails
+      }
+    }
+
+    try {
+      const res = await fetch(contact_form_action, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (res.ok) {
+        form.classList.add("hidden");
+        successEl.classList.remove("hidden");
+      } else {
+        const json = await res.json().catch(() => ({}));
+
+        // Show field-level errors if present
+        if (json.details?.fieldErrors) {
+          const fields = json.details.fieldErrors;
+          const msgs = Object.entries(fields)
+            .map(([field, errs]) => `${field}: ${errs[0]}`)
+            .join("\n");
+          errorMsg.textContent = msgs;
+        } else {
+          errorMsg.textContent = json.error || translations.errorFallback;
+        }
+
+        errorEl.classList.remove("hidden");
+        submitBtn.disabled = false;
+        submitBtn.textContent = translations.sendMessage;
+      }
+    } catch {
+      errorMsg.textContent = translations.errorNetwork;
+      errorEl.classList.remove("hidden");
+      submitBtn.disabled = false;
+      submitBtn.textContent = translations.sendMessage;
+    }
+  });
+</script>

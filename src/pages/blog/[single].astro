@@ -1,0 +1,58 @@
+---
+import Base from "@/layouts/Base.astro";
+import BlogSingle from "@/layouts/BlogSingle.astro";
+import { getSinglePage } from "@/lib/contentParser.astro";
+import config from "@/config/config.json";
+
+export async function getStaticPaths() {
+  const BLOG_FOLDER = "blog";
+  const posts = await getSinglePage(BLOG_FOLDER);
+
+  const paths = posts
+    .filter((post) => post.id.startsWith("de/"))
+    .map((post) => ({
+      params: {
+        single: post.id.replace(/^de\//, ""),
+      },
+      props: { post },
+    }));
+  return paths;
+}
+
+const { post } = Astro.props;
+const { title, meta_title, description, image, date, author } = post.data;
+
+const blogPostSchema = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": title,
+  "image": image ? (image.startsWith("http") ? image : `${config.site.base_url}${image}`) : undefined,
+  "datePublished": date ? new Date(date).toISOString() : undefined,
+  "author": {
+    "@type": "Person",
+    "name": author || "Admin"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": config.site.title,
+    "logo": {
+      "@type": "ImageObject",
+      "url": `${config.site.base_url}${config.site.logo}`
+    }
+  },
+  "description": description || title,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": `${config.site.base_url}/blog/${post.id.replace(/^de\//, "")}/`
+  }
+};
+---
+
+<Base
+  title={title}
+  meta_title={meta_title}
+  description={description}
+  image={image}
+  schema={blogPostSchema}>
+  <BlogSingle post={post} />
+</Base>

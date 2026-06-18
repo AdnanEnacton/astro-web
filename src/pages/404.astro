@@ -1,0 +1,44 @@
+---
+import ImageMod from "@/components/ImageMod.astro";
+import DynamicIcon from "@/helpers/DynamicIcon";
+import Base from "@/layouts/Base.astro";
+import { getRelativeLocaleUrl } from "astro:i18n";
+import { useTranslations } from "@/i18n/ui";
+
+const locale = Astro.currentLocale || "de";
+const t = useTranslations(locale);
+---
+
+<Base title={t("page_not_found")} notFoundPage={true}>
+  <section class="section text-center">
+    <div class="container" data-aos="fade-up-sm" data-aos-delay="100">
+      <div class="row justify-center">
+        <div class="sm:col-10 md:col-8 lg:col-7 text-center">
+          <ImageMod
+            class="mx-auto mb-16 block w-[480px]"
+            src="/images/404.svg"
+            alt="404 image"
+            title="404 image"
+          />
+          <h1 class="h2 md:h1 mb-4">{t("page_not_found")}</h1>
+          <div class="content">
+            <p>
+              {t("page_not_found_desc")}
+            </p>
+          </div>
+          <a href={getRelativeLocaleUrl(locale, "/")} class="btn btn-dark mt-8" title={t("back_to_home")}>
+            {t("back_to_home")}
+            <span class="icon-wrapper">
+              <span class="icon">
+                <DynamicIcon icon={"FaArrowRight"} />
+              </span>
+              <span class="icon" aria-hidden="true">
+                <DynamicIcon icon={"FaArrowRight"} />
+              </span>
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

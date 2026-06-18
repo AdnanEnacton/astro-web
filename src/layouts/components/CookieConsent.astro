@@ -1,0 +1,78 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n";
+import config from "@/config/config.json";
+
+const currentLocale = Astro.currentLocale || "de";
+const siteUrl = config.site.base_url || "https://pontora-marketing-website.pages.dev";
+// Ensure siteUrl has no trailing slash, then append the relative locale URL
+const policyUrl = siteUrl.replace(/\/$/, "") + getRelativeLocaleUrl(currentLocale, "/terms-conditions/");
+---
+
+<!-- Cookie Consent by TermsFeed https://www.TermsFeed.com -->
+<script is:inline type="text/javascript" src="https://www.termsfeed.com/public/cookie-consent/4.2.0/cookie-consent.js" charset="UTF-8"></script>
+
+<script is:inline define:vars={{ currentLocale, policyUrl }}>
+  function runTermsFeed() {
+    if (window.cookieconsent && !window.hasTermsFeedConsentInit) {
+      window.cookieconsent.run({
+        "notice_banner_type": "interstitial",
+        "consent_type": "express",
+        "palette": "light",
+        "language": currentLocale,
+        "page_load_consent_levels": ["strictly-necessary"],
+        "notice_banner_reject_button_hide": false,
+        "preferences_center_close_button_hide": false,
+        "page_refresh_confirmation_buttons": false,
+        "website_name": "Pontora Marketing",
+        "website_privacy_policy_url": policyUrl
+      });
+      window.hasTermsFeedConsentInit = true;
+    }
+  }
+
+  // Run on initial load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runTermsFeed);
+  } else {
+    runTermsFeed();
+  }
+
+  // Support Astro View Transitions (page navigations)
+  document.addEventListener("astro:page-load", runTermsFeed);
+</script>
+
+<style is:global>
+  .termsfeed-com---nb-interstitial {
+    top: unset !important;
+    bottom: 3vh !important;
+  }
+  .termsfeed-com---palette-light .cc-nb-okagree {
+    color: #fff !important;
+    background: var(--color-primary) !important;
+    border: none !important;
+    transition: all 0.3s ease-in-out !important; 
+    border-radius: 9999px;
+  }
+  .termsfeed-com---palette-light .cc-nb-okagree:hover {
+    background: var(--color-secondary) !important;
+    color: #1d1d1d !important;
+  }
+  .termsfeed-com---palette-light .cc-nb-reject {
+    color: #1d1d1d !important;
+    background: #ffffff !important;
+    border: 1px solid #E5E7EB !important;
+    transition: all 0.3s ease-in-out !important;
+    border-radius: 9999px;
+  }
+  .termsfeed-com---palette-light .cc-nb-reject:hover {
+    background: var(--color-secondary) !important;
+    color: #1d1d1d !important;
+    border-color: var(--color-secondary) !important;
+  }
+  .termsfeed-com---palette-light .cc-nb-changep{
+    border-radius: 9999px;
+  }
+  .termsfeed-com---palette-light.termsfeed-com---nb{
+    border-radius: 14px;
+  }
+</style>

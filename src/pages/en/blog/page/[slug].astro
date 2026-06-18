@@ -1,0 +1,64 @@
+---
+import Pagination from "@/components/Pagination.astro";
+import config from "@/config/config.json";
+import Base from "@/layouts/Base.astro";
+import { getListPage, getSinglePage } from "@/lib/contentParser.astro";
+import { sortByDate } from "@/lib/utils/sortFunctions";
+import BlogSection from "@/partials/BlogSection.astro";
+import CallToAction from "@/partials/CallToAction.astro";
+
+const BLOG_FOLDER = "blog";
+
+const { slug } = Astro.params;
+const allPosts = await getSinglePage(BLOG_FOLDER);
+const posts = allPosts.filter((post) => post.id.startsWith("en/"));
+const postIndex = await getListPage(
+  "blogPage",
+  "en/blog"
+);
+if (postIndex.data.draft) {
+  return Astro.redirect("/en/404");
+}
+const sortedPosts = sortByDate(posts);
+const totalPages = Math.ceil(posts.length / config.settings.pagination);
+const currentPage = slug && !isNaN(Number(slug)) ? Number(slug) : 1;
+const indexOfLastPost = currentPage * config.settings.pagination;
+const indexOfFirstPost = indexOfLastPost - config.settings.pagination;
+const currentPosts = sortedPosts.slice(indexOfFirstPost, indexOfLastPost);
+
+export async function getStaticPaths() {
+  const BLOG_FOLDER = "blog";
+  const allPosts = await getSinglePage(BLOG_FOLDER);
+  const posts = allPosts.filter((post) => post.id.startsWith("en/"));
+  const totalPages = Math.ceil(posts.length / config.settings.pagination);
+  const paths = [];
+
+  for (let i = 1; i < totalPages; i++) {
+    paths.push({
+      params: {
+        slug: (i + 1).toString(),
+      },
+    });
+  }
+  return paths;
+}
+const { blog_section, pagination, page_cta } = postIndex.data;
+---
+
+<Base {...postIndex.data}>
+  {blog_section && blog_section.enable !== false && (
+    <BlogSection
+      largeHeading={blog_section.large_heading}
+      visiblePosts={3}
+      posts={currentPosts}
+    />
+  )}
+  {pagination && pagination.enable !== false && (
+    <Pagination
+      section={BLOG_FOLDER}
+      currentPage={currentPage}
+      totalPages={totalPages}
+    />
+  )}
+  {page_cta && page_cta.enable !== false && <CallToAction content={page_cta} />}
+</Base>

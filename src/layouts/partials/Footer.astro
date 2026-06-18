@@ -1,0 +1,98 @@
+---
+import Logo from "@/components/Logo.astro";
+import Social from "@/components/Social.astro";
+import menu from "@/config/menu.json";
+import social from "@/config/social.json";
+import { markdownify } from "@/lib/utils/textConverter";
+import { getRelativeLocaleUrl } from "astro:i18n";
+import { useTranslations } from "@/i18n/ui";
+
+const currentLocale = Astro.currentLocale || "de";
+const menuData = (menu as any)[currentLocale] || menu.de;
+const { footer_menu, footer_quick_links } = menuData;
+const t = useTranslations(currentLocale);
+
+// Function to replace {year} this from string to year
+function replaceYear(text: string) {
+  const year = new Date().getFullYear();
+
+  return text.replace("{year}", year.toString());
+}
+---
+
+<footer class="bg-light pt-16 pb-10 xl:pt-28 xl:pb-20">
+  <div class="container" data-aos="fade-up-sm">
+    <div class="row gy-6 justify-between lg:g-4">
+      <div class="sm:col-6 lg:col-5 lg:pe-16">
+        <div class="mb-5">
+          <Logo />
+        </div>
+        {
+          t("footer.description") && (
+            <p
+              class="mb-6"
+              set:html={markdownify(t("footer.description"))}
+            />
+          )
+        }
+      </div>
+      <div class="sm:col-6 lg:col-6">
+        <div
+          class="flex flex-wrap gap-y-6 sm:flex-nowrap md:justify-end lg:justify-around">
+          <div class="w-[160px]">
+            <h3 class="mb-4 pt-2 text-base text-text-dark md:mb-9">
+              {t("footer.resources")}
+            </h3>
+            <ul class="flex flex-col gap-3">
+              {
+                footer_menu.map((item: any) => (
+                  <li>
+                    <a
+                      class="font-medium transition hover:text-tertiary"
+                      href={getRelativeLocaleUrl(currentLocale, item.url)}
+                      title={item.name}>
+                      {item.name}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+          <div class="w-[160px]">
+            <h3 class="mb-4 pt-2 text-base text-text-dark md:mb-9">
+              {t("footer.quick_info")}
+            </h3>
+            <ul class="flex flex-col gap-3">
+              {
+                footer_quick_links.map((item: any) => (
+                  <li>
+                    <a
+                      class="font-medium transition hover:text-tertiary"
+                      href={getRelativeLocaleUrl(currentLocale, item.url)}
+                      title={item.name}>
+                      {item.name}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="border-border/50 my-10" />
+
+    <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+      {
+        t("footer.copyright") && (
+          <div
+            class="text-base text-text"
+            set:html={markdownify(replaceYear(t("footer.copyright")))}
+          />
+        )
+      }
+      <Social source={social?.main} className="social-icons" />
+    </div>
+  </div>
+</footer>

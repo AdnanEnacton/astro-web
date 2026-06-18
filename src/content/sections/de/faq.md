@@ -1,0 +1,30 @@
+---
+enable: true
+subtitle: "FAQ"
+title: "Häufig gestellte Fragen"
+description: "Erfahren Sie, wie Pontora Unternehmen, Mitarbeitern und Treuhandgesellschaften hilft, Verwaltung und Abläufe zu steuern."
+
+# FAQ List
+list:
+  - title: "Was ist Pontora?"
+    description: "Pontora ist eine Plattform für Geschäftsabläufe mit verschiedenen Rollen für Unternehmen, Mitarbeiter, Standortleiter und Treuhandgesellschaften. Sie zentralisiert Mitarbeiterdaten, Dokumente, Aufgaben, Formulare, Stundenzettel, Belege, Buchhaltungsunterlagen, tägliche Gastro-Einträge und die Zusammenarbeit mit Treuhändern."
+    active: true
+  - title: "Wer nutzt Pontora?"
+    description: "Pontora wurde für Unternehmens-Admins, Mitarbeiter, Standortleiter, Treuhand-Admins und Treuhand-Teammitglieder entwickelt. Jede Rolle erhält einen fokussierten Arbeitsbereich mit den für ihre Aufgaben relevanten Workflows und Berechtigungen."
+  - title: "Welche Probleme löst Pontora?"
+    description: "Pontora reduziert die verstreute Verwaltung in Tabellenkalkulationen, E-Mail-Verläufen, manuellen Ordnern und unzusammenhängenden Tools. Es bietet Unternehmen ein strukturiertes System für Personalverwaltung, Dokumenten-Workflows, Aufgaben, Zeiterfassung, Belegverfolgung und die Zusammenarbeit mit Treuhändern."
+  - title: "Können Treuhandgesellschaften mehrere Unternehmen verwalten?"
+    description: "Ja. Treuhandgesellschaften können zugewiesene Mandantenunternehmen verwalten, interne Teammitglieder hinzufügen, Teammitglieder bestimmten Unternehmen zuweisen und Genehmigungs-Workflows für Unternehmensnutzer erstellen."
+  - title: "Unterstützt Pontora das Onboarding von Mitarbeitern?"
+    description: "Ja. Mitarbeiter können Profilabschnitte ausfüllen, persönliche Daten und Beschäftigungsdetails hinzufügen, erforderliche Dokumente hochladen und Onboarding-Aufgaben direkt über ihren Mitarbeiter-Arbeitsbereich erledigen."
+  - title: "Beinhaltet Pontora die Dokumentengenerierung?"
+    description: "Ja. Pontora enthält Dokumentenvorlagen, Makros, ausfüllbare Felder, Vorschauoptionen, PDF-Export und Workflows zur Dokumentenausgabe."
+  - title: "Unterstützt Pontora Stundenzettel und Urlaubsregeln?"
+    description: "Ja. Pontora unterstützt die Konfiguration von Arbeitszeiten, Feiertagen, Urlaubsregeln, Überstunden- und Zuschlagseinstellungen, Arbeitszeiterfassung für Mitarbeiter, Urlaubsanträge, Salden, Auszahlungen und Korrekturen."
+  - title: "Können Unternehmen Belege und Kassenbücher verwalten?"
+    description: "Ja. Pontora unterstützt Belegdaten, Kassenbuchansichten, manuelle Einträge, Etiketten, Datenexporte, Archive und Workflows zur OCR-gestützten Belegextraktion."
+  - title: "Ist Pontora für mehrere Standorte geeignet?"
+    description: "Ja. Unternehmen können Standorte verwalten und Mitarbeiter, Standortleiter, Aufgaben, Stundenzettel, Gastro-Einträge, Belege und Einstellungen mit dem Standortkontext verknüpfen."
+  - title: "Wie handhabt Pontora die Zugriffskontrolle?"
+    description: "Pontora ist nach Rollen, Organisationen und Standorten strukturiert. Unternehmens-Admins, Mitarbeiter, Standortleiter, Treuhand-Admins und Treuhand-Teammitglieder haben unterschiedliche Arbeitsbereiche und Berechtigungen. Der Treuhand-Zugriff kann nach Mandanten-Zuweisungen eingegrenzt werden."
+---

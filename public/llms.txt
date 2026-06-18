@@ -1,0 +1,13 @@
+# Pontora - Multi-Tenant Operations Platform
+
+> Pontora is a multi-tenant operations platform for trustee firms, companies, site managers, and employees to manage workforce administration, documents, tasks, approvals, timesheets, receipts, and daily business operations. This file provides an overview of the key pages, documentation, and resources on our website for LLMs.
+
+## Main Pages
+
+- [Home Page](https://pontora-marketing.vercel.app/) - Our primary banner, operational roles overview, module inventory, customer testimonials, and quick start guides.
+- [About Us](https://pontora-marketing.vercel.app/about/) - Discover Pontora's mission and our dedication to simplifying business administration.
+- [Pricing](https://pontora-marketing.vercel.app/pricing/) - Flexible subscription plans (Starter and Professional) for operations management.
+- [Features](https://pontora-marketing.vercel.app/features/) - Deep dive into role-based workspaces, document automation, time tracking, finance operations, and trustee collaboration.
+- [Contact](https://pontora-marketing.vercel.app/contact/) - Get in touch with the Pontora support and sales team.
+- [Blog](https://pontora-marketing.vercel.app/blog/) - Stay updated with our latest operational insights, compliance reviews, and tech guides.
+

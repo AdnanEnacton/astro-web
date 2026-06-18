@@ -1,0 +1,25 @@
+---
+import Base from "@/layouts/Base.astro";
+import { getListPage } from "@/lib/contentParser.astro";
+import FeaturesGrid from "@/partials/FeaturesGrid.astro";
+import FeatureSection from "@/partials/FeatureSection.astro";
+import FeaturesExplanation from "@/partials/FeaturesExplanation.astro";
+import CallToAction from "@/partials/CallToAction.astro";
+import HowItWorks from "@/partials/HowItWorks.astro";
+
+const locale = Astro.currentLocale || "de";
+const features = await getListPage("features", `${locale}/features`);
+if (features.data.draft) {
+  return Astro.redirect(locale === "en" ? "/en/404" : "/404");
+}
+
+const { features_grid, features_section, features_explanation, how_it_works, page_cta } = features.data;
+---
+
+<Base {...features.data}>
+  {features_grid && features_grid.enable !== false && <FeaturesGrid content={features_grid} largeHeading />}
+  {features_section && features_section.enable !== false && <FeatureSection content={features_section} />}
+  {features_explanation && features_explanation.enable !== false && <FeaturesExplanation content={features_explanation} />}
+  {how_it_works && how_it_works.enable !== false && <HowItWorks content={how_it_works} />}
+  {page_cta && page_cta.enable !== false && <CallToAction content={page_cta} />}
+</Base>
