@@ -1,10 +1,12 @@
 ---
 import ImageMod from "@/components/ImageMod.astro";
-import DynamicIcon from "@/helpers/DynamicIcon";
-const locale = Astro.currentLocale || "de";
+import DynamicIcon from "@/helpers/DynamicIcon.astro";
 import { getListPage } from "@/lib/contentParser.astro";
 import { markdownify } from "@/lib/utils/textConverter";
 import { getRelativeLocaleUrl } from "astro:i18n";
+import { tinaField } from "@tinacms/astro";
+
+const locale = Astro.currentLocale || "de";
 
 const getLocaleUrl = (url: string) => {
   if (!url) return "";
@@ -13,14 +15,16 @@ const getLocaleUrl = (url: string) => {
     : getRelativeLocaleUrl(locale, url.startsWith("/") ? url : `/${url}`);
 };
 
-const { content } = Astro.props;
+const { content, tinaFieldPath, parentData } = Astro.props;
 
 const defaultData = await getListPage("ctaSection", `${locale}/call-to-action`);
+if (!defaultData && !content) return null;
+
 const sectionData = {
   data: {
-    ...defaultData.data,
-    ...(content || {})
-  }
+    ...(defaultData?.data ?? {}),
+    ...(content || {}),
+  },
 };
 if(!sectionData.data.enable){
   return null;
@@ -36,7 +40,8 @@ const { enable = true, title, description, image = "/images/cta-bg.svg", button,
           <div
             class="absolute top-1/2! -translate-y-1/2! left-1/2! -translate-x-1/2! rotate-[7.83deg] pointer-events-none"
             data-aos="fade-in"
-            data-aos-delay="200">
+            data-aos-delay="200"
+            data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.image`) : undefined}>
             <ImageMod class=" h-[641px] w-auto " src={image} alt="cta-image" title="cta-image" />
           </div>
           <div class="row items-center justify-center">
@@ -45,12 +50,14 @@ const { enable = true, title, description, image = "/images/cta-bg.svg", button,
                 set:html={markdownify(title)}
                 class="text-text-light mb-4"
                 data-aos="fade-up-sm"
+                data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.title`) : undefined}
               />
               <p
                 set:html={markdownify(description)}
                 class="text-text-light text-lg/[inherit] mb-6"
                 data-aos="fade-up-sm"
                 data-aos-delay="50"
+                data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.description`) : undefined}
               />
               <div class="flex flex-wrap justify-center gap-4 relative z-10">
                 {button?.enable && (
@@ -61,7 +68,8 @@ const { enable = true, title, description, image = "/images/cta-bg.svg", button,
                     target={button.link.startsWith("http") ? "_blank" : "_self"}
                     rel="noopener"
                     data-aos="fade-up-sm"
-                    data-aos-delay="200">
+                    data-aos-delay="200"
+                    data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.button`) : undefined}>
                     {button.label}
                     <span class="icon-wrapper">
                       <span class="icon">
@@ -81,7 +89,8 @@ const { enable = true, title, description, image = "/images/cta-bg.svg", button,
                     target={secondary_link.link.startsWith("http") ? "_blank" : "_self"}
                     rel="noopener"
                     data-aos="fade-up-sm"
-                    data-aos-delay="250">
+                    data-aos-delay="250"
+                    data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.secondary_link`) : undefined}>
                     {secondary_link.label}
                     <span class="icon-wrapper">
                       <span class="icon">

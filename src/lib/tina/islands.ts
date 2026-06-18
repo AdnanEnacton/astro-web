@@ -1,44 +1,38 @@
-  import type { IslandRegistry } from '@tinacms/astro/experimental';
-import PageSections from '../../layouts/partials/PageSections.astro';
-import { getSinglePage } from '../contentParser.astro';
-import config from '../../config/config.json';
+import type { IslandRegistry } from "@tinacms/astro/experimental";
+import type { QueryResult } from "@tinacms/astro/data";
+import type { PagesQuery } from "../../../tina/__generated__/types";
+import PageSections from "../../layouts/partials/PageSections.astro";
+import { resolvePageData } from "./data";
+import type { CollectionKey } from "astro:content";
 
 export const islands: IslandRegistry = {
-  'page-layout': {
+  "page-layout": {
     component: PageSections,
-    fetch: async (request, params) => {
-      const payload = await request.json();
-      
-      const locale = params.get('locale') || 'en';
-      const type = params.get('type') || 'pages';
-      
-      let posts: any[] = [];
-      let totalPages = 0;
-      
-      const data = payload.data || payload;
-      const hasBlogSection = data.sections && data.sections.some(
-        (s: any) => s._template === "blog_section" || s._template === "pagination"
-      );
+    fetch: async (_request, params) => {
+      const slug = params.get("slug") ?? "";
+      const locale = params.get("locale") ?? "de";
+      const type = (params.get("type") ?? "pages") as CollectionKey;
 
-      if (hasBlogSection) {
-        posts = (await getSinglePage("blog")).filter((post) =>
-          post.id.startsWith(locale + "/")
-        );
-        totalPages = Math.ceil(posts.length / config.settings.pagination);
-      }
+      const { data, tinaPage } = await resolvePageData(slug, type, undefined, {
+        priority: "primary",
+      });
+
+      return { page: tinaPage, data, locale, type };
+    },
+    propsFromData: (result) => {
+      const payload = result as {
+        page: QueryResult<PagesQuery>;
+        data: PagesQuery["pages"];
+        locale: string;
+        type: string;
+      };
 
       return {
-        data,
-        posts,
-        totalPages,
-        type,
+        type: payload.type || "pages",
+        locale: payload.locale || "de",
+        data: payload.data ?? payload.page?.data?.pages,
       };
     },
-    propsFromData: (data: any) => {
-      return data as Record<string, any>;
-    },
-    wrapper: {
-      tag: 'main'
-    }
-  }
+    wrapper: { tag: "div", className: "tina-page-layout" },
+  },
 };

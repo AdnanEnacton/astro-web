@@ -1,21 +1,25 @@
 ---
 import BlogCard from "@/components/BlogCard.astro";
-const locale = Astro.currentLocale || "de";
 import { getListPage, getSinglePage } from "@/lib/contentParser.astro";
 import { sortByDate } from "@/lib/utils/sortFunctions";
 import { markdownify } from "@/lib/utils/textConverter";
+import { tinaField } from "@tinacms/astro";
 
-let { content, largeHeading, visiblePosts, posts, cardLayout } = Astro.props;
+const locale = Astro.currentLocale || "de";
+
+let { content, largeHeading, visiblePosts, posts, cardLayout, tinaFieldPath, parentData } = Astro.props;
 
 // Get default blog data from the "sections" content collection
-const sectionData = await getListPage("blogSection", `${locale}/blog`);
-if(!sectionData.data.enable){
+const defaultData = await getListPage("blogSection", `${locale}/blog`);
+if (!defaultData && !content) return null;
+
+let { title, subtitle, description } = {
+  ...(defaultData?.data ?? {}),
+  ...(content || {}),
+};
+
+if (content?.enable === false || defaultData?.data?.enable === false) {
   return null;
-}
-let { title, subtitle, description } = sectionData.data;
-// Override default blog data (Title, Subtitle & Description) with props if provided
-if (content) {
-  ({ title, subtitle, description } = content);
 }
 
 // Constant for blog folder path
@@ -41,18 +45,20 @@ visiblePosts && (sortedPosts = sortedPosts.slice(0, visiblePosts));
               <p
                 class="mb-2 font-medium text-tertiary"
                 set:html={markdownify(subtitle)}
+                data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.subtitle`) : undefined}
               />
             )}
             {title &&
               (largeHeading ? (
-                <h1 class="h2 md:h1 mb-6" set:html={markdownify(title)} />
+                <h1 class="h2 md:h1 mb-6" set:html={markdownify(title)} data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.title`) : undefined} />
               ) : (
-                <h2 class="mb-6" set:html={markdownify(title)} />
+                <h2 class="mb-6" set:html={markdownify(title)} data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.title`) : undefined} />
               ))}
             {description && (
               <p
                 class="text-lg/[inherit]"
                 set:html={markdownify(description)}
+                data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.description`) : undefined}
               />
             )}
           </div>

@@ -1,11 +1,13 @@
 ---
 import { Image } from "astro:assets";
 import ImageMod from "@/components/ImageMod.astro";
-const locale = Astro.currentLocale || "de";
 import { getListPage } from "@/lib/contentParser.astro";
 import { markdownify } from "@/lib/utils/textConverter";
+import { tinaField } from "@tinacms/astro";
 
-const { hideHeadingBar, content } = Astro.props;
+const locale = Astro.currentLocale || "de";
+
+const { hideHeadingBar, content, tinaFieldPath, parentData } = Astro.props;
 
 let sectionData;
 if (content) {
@@ -20,10 +22,12 @@ if (content) {
     }
   };
 } else {
-  sectionData = await getListPage("featuresExplanationSection", `${locale}/features-explanation`);
+  const defaultData = await getListPage("featuresExplanationSection", `${locale}/features-explanation`);
+  if (!defaultData) return null;
+  sectionData = defaultData;
 }
 
-if(!sectionData.data.enable){
+if (!sectionData?.data?.enable) {
   return null;
 }
 const { title, image, subtitle, description, list } = sectionData.data;
@@ -41,13 +45,15 @@ const { title, image, subtitle, description, list } = sectionData.data;
               <p
                 class="mb-2 font-medium text-tertiary"
                 set:html={markdownify(subtitle)}
+                data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.subtitle`) : undefined}
               />
             )}
-            {title && <h2 class="mb-6" set:html={markdownify(title)} />}
+            {title && <h2 class="mb-6" set:html={markdownify(title)} data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.title`) : undefined} />}
             {description && (
               <p
                 class="text-lg/[inherit]"
                 set:html={markdownify(description)}
+                data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.description`) : undefined}
               />
             )}
           </div>
@@ -60,11 +66,13 @@ const { title, image, subtitle, description, list } = sectionData.data;
           {
             list?.map((item: any, mindex: number) => (
               <div
-                class={`order-2 flex gap-x-3 xl:order-0 max-xl:justify-center xl:items-center ${mindex < 1 ? "flex-col max-xl:gap-y-3 md:w-[60%] xl:w-auto xl:flex-row" : "flex-col gap-y-3 sm:flex-row"}`}>
+                class={`order-2 flex gap-x-3 xl:order-0 max-xl:justify-center xl:items-center ${mindex < 1 ? "flex-col max-xl:gap-y-3 md:w-[60%] xl:w-auto xl:flex-row" : "flex-col gap-y-3 sm:flex-row"}`}
+                data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.list.${mindex}`) : undefined}>
                 {/* Main Features List */}
                 {item.row.map((item: any, index: number) => (
                   <div
-                    class={`${(index + 1) % 2 === 0 ? "xl:order-3" : "xl:order-1"} xl:max-w-[370px]`}>
+                    class={`${(index + 1) % 2 === 0 ? "xl:order-3" : "xl:order-1"} xl:max-w-[370px]`}
+                    data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.list.${mindex}.row.${index}`) : undefined}>
                     <div
                       class="mb-12 min-h-full rounded-xl bg-light px-6 py-12 text-center last:mb-0 md:rounded-3xl"
                       data-aos="fade-up-sm"
@@ -73,10 +81,11 @@ const { title, image, subtitle, description, list } = sectionData.data;
                         <h3
                           class="h6 mb-2"
                           set:html={markdownify(item.title)}
+                          data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.list.${mindex}.row.${index}.title`) : undefined}
                         />
                       )}
                       {item.description && (
-                        <p set:html={markdownify(item.description)} />
+                        <p set:html={markdownify(item.description)} data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.list.${mindex}.row.${index}.description`) : undefined} />
                       )}
                     </div>
                   </div>
@@ -106,6 +115,7 @@ const { title, image, subtitle, description, list } = sectionData.data;
                   title={title}
                   width={907}
                   height={1856}
+                  data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.image`) : undefined}
                 />
               </div>
             )

@@ -1,10 +1,7 @@
-import { experimental_createIslandRoute } from '@tinacms/astro/experimental';
-import { islands } from '../../lib/tina/islands';
+import type { APIRoute } from "astro";
+import { experimental_createIslandRoute } from "@tinacms/astro/experimental";
+import { islands } from "../../lib/tina/islands";
 
-export const prerender = import.meta.env.PROD;
+export const prerender = false;
 
-export async function getStaticPaths() {
-  return [];
-}
-
-export const ALL = experimental_createIslandRoute(islands);
+export const ALL: APIRoute = experimental_createIslandRoute(islands);

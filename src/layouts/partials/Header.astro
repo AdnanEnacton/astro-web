@@ -20,7 +20,7 @@ export interface NavigationLink {
   children?: ChildNavigationLink[];
 }
 
-const { banner, bannerData, errorPage } = Astro.props;
+const { banner, bannerData, errorPage, bannerTinaPath, parentData } = Astro.props;
 
 const currentLocale = Astro.currentLocale || "de";
 const t = useTranslations(currentLocale);
@@ -306,7 +306,7 @@ if (!config.site.trailing_slash && otherLocaleUrl !== "/") {
   </header>
 
   {/* Show Only In Home Page */}
-  {banner && <HomeBanner content={bannerData} />}
+  {banner && <HomeBanner content={bannerData} tinaFieldPath={bannerTinaPath} parentData={parentData} />}
 
   <div aria-hidden="true">
     <ImageMod

@@ -1,16 +1,19 @@
 ---
-const locale = Astro.currentLocale || "de";
 import { getListPage } from "@/lib/contentParser.astro";
 import { markdownify } from "@/lib/utils/textConverter";
+import { tinaField } from "@tinacms/astro";
 
-const { content } = Astro.props;
+const locale = Astro.currentLocale || "de";
+const { content, tinaFieldPath, parentData } = Astro.props;
 
 const defaultData = await getListPage("faq", `${locale}/-index`);
+if (!defaultData && !content) return null;
+
 const sectionData = {
   data: {
-    ...defaultData.data,
-    ...(content || {})
-  }
+    ...(defaultData?.data ?? {}),
+    ...(content || {}),
+  },
 };
 if(!sectionData.data.enable){
   return null;
@@ -26,13 +29,15 @@ const { title, subtitle, description, list } = sectionData.data;
               <p
                 class="mb-2 font-medium text-tertiary"
                 set:html={markdownify(subtitle)}
+                data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.subtitle`) : undefined}
               />
             )}
-            {title && <h2 class="mb-6" set:html={markdownify(title)} />}
+            {title && <h2 class="mb-6" set:html={markdownify(title)} data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.title`) : undefined} />}
             {description && (
               <p
                 class="text-lg/[inherit]"
                 set:html={markdownify(description)}
+                data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.description`) : undefined}
               />
             )}
           </div>

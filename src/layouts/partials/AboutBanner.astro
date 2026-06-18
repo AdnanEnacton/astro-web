@@ -3,9 +3,20 @@ import ImageMod from "@/components/ImageMod.astro";
 const locale = Astro.currentLocale || "de";
 import { getListPage } from "@/lib/contentParser.astro";
 import { markdownify } from "@/lib/utils/textConverter";
+import { tinaField } from "@tinacms/astro";
 
-const sectionData = await getListPage("aboutBannerSection", `${locale}/about-banner`);
-if(!sectionData.data.enable){
+const { content, tinaFieldPath, parentData } = Astro.props;
+
+let sectionData;
+if (content) {
+  sectionData = { data: content };
+} else {
+  const defaultData = await getListPage("aboutBannerSection", `${locale}/about-banner`);
+  if (!defaultData) return null;
+  sectionData = defaultData;
+}
+
+if (!sectionData?.data?.enable) {
   return null;
 }
 const { title, subtitle, description, left_image, right_image, quote } = sectionData.data;
@@ -20,13 +31,14 @@ const { title, subtitle, description, left_image, right_image, quote } = section
             <p
               class="mb-2 font-medium text-tertiary"
               set:html={markdownify(subtitle)}
+              data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.subtitle`) : undefined}
             />
           )
         }
-        {title && <h2 class="mb-6" set:html={markdownify(title)} />}
+        {title && <h2 class="mb-6" set:html={markdownify(title)} data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.title`) : undefined} />}
         {
           description && (
-            <p class="text-lg/[inherit]" set:html={markdownify(description)} />
+            <p class="text-lg/[inherit]" set:html={markdownify(description)} data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.description`) : undefined} />
           )
         }
       </div>
@@ -40,6 +52,7 @@ const { title, subtitle, description, left_image, right_image, quote } = section
                   src={left_image}
                   alt={`image related to ${title}`}
                   title={`image related to ${title}`}
+                  data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.left_image`) : undefined}
                 />
               </div>
             )
@@ -52,27 +65,31 @@ const { title, subtitle, description, left_image, right_image, quote } = section
                   src={right_image}
                   alt={`image related to ${title}`}
                   title={`image related to ${title}`}
+                  data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.right_image`) : undefined}
                 />
               )
             }
             {
               quote && (
-                <div class="relative mt-10 rounded-lg bg-tertiary p-6 pt-10 text-text-light md:rounded-3xl md:pt-8">
+                <div class="relative mt-10 rounded-lg bg-tertiary p-6 pt-10 text-text-light md:rounded-3xl md:pt-8" data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.quote`) : undefined}>
                   <div class="mb-4 flex items-center gap-5">
                     <ImageMod
                       class="h-16 w-16 object-cover"
                       src={quote.avatar}
                       alt={`avatar related to ${quote.name}`}
                       title={`avatar related to ${quote.name}`}
+                      data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.quote.avatar`) : undefined}
                     />
                     <div>
                       <h3
                         class="h6 text-inherit"
                         set:html={markdownify(quote.name)}
+                        data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.quote.name`) : undefined}
                       />
                       <p
                         class="text-inherit"
                         set:html={markdownify(quote.designation)}
+                        data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.quote.designation`) : undefined}
                       />
                     </div>
                   </div>
@@ -80,6 +97,7 @@ const { title, subtitle, description, left_image, right_image, quote } = section
                     <p
                       class="text-lg/[inherit] text-inherit"
                       set:html={markdownify(quote.content)}
+                      data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.quote.content`) : undefined}
                     />
                   )}
 

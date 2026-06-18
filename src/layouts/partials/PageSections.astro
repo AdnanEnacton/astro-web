@@ -15,98 +15,122 @@ import ContactHero from "@/partials/ContactHero.astro";
 import BlogSection from "@/partials/BlogSection.astro";
 import Pagination from "@/components/Pagination.astro";
 import { tinaField } from "@tinacms/astro";
+import { getSectionTemplate, normalizeSections } from "@/lib/tina/sections";
+import { getSinglePage } from "@/lib/contentParser.astro";
+import config from "@/config/config.json";
 
-const { data, posts, totalPages, type } = Astro.props;
+const { data, posts: postsProp, totalPages: totalPagesProp, type, locale: localeProp } = Astro.props;
+const locale = localeProp || Astro.currentLocale || "de";
+const sections = normalizeSections(data?.sections);
+
+let posts = postsProp;
+let totalPages = totalPagesProp;
+
+const needsBlogData =
+  sections.some((section) => {
+    const template = getSectionTemplate(section);
+    return template === "blog_section" || template === "pagination";
+  }) && posts === undefined;
+
+if (needsBlogData) {
+  const blogPosts = (await getSinglePage("blog")).filter((post) =>
+    post.id.startsWith(`${locale}/`)
+  );
+  posts = blogPosts;
+  totalPages = Math.ceil(blogPosts.length / config.settings.pagination);
+}
 ---
 
-{data.sections &&
-  data.sections.map((section: any, index: number) => {
+{sections.map((section: any, index: number) => {
     if (section.enable === false) return null;
+    const template = getSectionTemplate(section);
 
     return (
       <div data-tina-field={tinaField(data, `sections.${index}`)}>
         {/* Banner Section (Handled by Layout Header, return null in body) */}
-        {section._template === "banner" && null}
+        {template === "banner" && null}
 
         {/* About Banner Section */}
-        {section._template === "about_banner" && (
-          <AboutBanner content={section} />
+        {template === "about_banner" && (
+          <AboutBanner content={section} tinaFieldPath={`sections.${index}`} parentData={data} />
         )}
 
         {/* Contact Hero Section */}
-        {section._template === "contact_hero" && (
-          <ContactHero content={section} />
+        {template === "contact_hero" && (
+          <ContactHero content={section} tinaFieldPath={`sections.${index}`} parentData={data} />
         )}
 
         {/* Clients Section */}
-        {section._template === "clients" && (
-          <Clients content={section} />
+        {template === "clients" && (
+          <Clients content={section} tinaFieldPath={`sections.${index}`} parentData={data} />
         )}
 
         {/* Our Values Section */}
-        {section._template === "our_values" && (
-          <OurValues content={section} />
+        {template === "our_values" && (
+          <OurValues content={section} tinaFieldPath={`sections.${index}`} parentData={data} />
         )}
 
         {/* Our Team Section */}
-        {section._template === "our_team" && (
-          <OurTeam content={section} />
+        {template === "our_team" && (
+          <OurTeam content={section} tinaFieldPath={`sections.${index}`} parentData={data} />
         )}
 
         {/* How It Works Section */}
-        {section._template === "how_it_works" && (
-          <HowItWorks content={section} />
+        {template === "how_it_works" && (
+          <HowItWorks content={section} tinaFieldPath={`sections.${index}`} parentData={data} />
         )}
 
         {/* Features Grid Section */}
-        {section._template === "features_grid" && (
-          <FeaturesGrid content={section} largeHeading={type === "features"} />
+        {template === "features_grid" && (
+          <FeaturesGrid content={section} largeHeading={type === "features"} tinaFieldPath={`sections.${index}`} parentData={data} />
         )}
 
         {/* Features Section */}
-        {section._template === "features_section" && (
-          <FeatureSection content={section} />
+        {template === "features_section" && (
+          <FeatureSection content={section} tinaFieldPath={`sections.${index}`} parentData={data} />
         )}
 
         {/* Features Explanation Section */}
-        {section._template === "features_explanation" && (
-          <FeaturesExplanation content={section} />
+        {template === "features_explanation" && (
+          <FeaturesExplanation content={section} tinaFieldPath={`sections.${index}`} parentData={data} />
         )}
 
         {/* Pricing Section */}
-        {section._template === "pricing" && (
-          <PricingSection content={section} largeHeading={type === "pricing"} />
+        {template === "pricing" && (
+          <PricingSection content={section} largeHeading={type === "pricing"} tinaFieldPath={`sections.${index}`} parentData={data} />
         )}
 
         {/* Testimonial Section */}
-        {section._template === "testimonial" && (
-          <Testimonial content={section} visible_testimonial={3} />
+        {template === "testimonial" && (
+          <Testimonial content={section} visible_testimonial={3} tinaFieldPath={`sections.${index}`} parentData={data} />
         )}
 
         {/* Blog Section */}
-        {section._template === "blog_section" && (
+        {template === "blog_section" && (
           <BlogSection
             largeHeading={section.large_heading}
             content={section}
             visiblePosts={section.visible_posts}
             cardLayout={section.card_layout}
             posts={posts}
+            tinaFieldPath={`sections.${index}`}
+            parentData={data}
           />
         )}
 
         {/* Pagination */}
-        {section._template === "pagination" && (
+        {template === "pagination" && (
           <Pagination section="blog" totalPages={totalPages} />
         )}
 
         {/* FAQ Section */}
-        {section._template === "faq" && (
-          <Faq content={section} />
+        {template === "faq" && (
+          <Faq content={section} tinaFieldPath={`sections.${index}`} parentData={data} />
         )}
 
         {/* CTA Section */}
-        {section._template === "page_cta" && (
-          <CallToAction content={section} />
+        {template === "page_cta" && (
+          <CallToAction content={section} tinaFieldPath={`sections.${index}`} parentData={data} />
         )}
       </div>
     );

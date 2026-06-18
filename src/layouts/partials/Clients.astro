@@ -1,17 +1,21 @@
 ---
 import { Image } from "astro:assets";
-const locale = Astro.currentLocale || "de";
 import { getListPage } from "@/lib/contentParser.astro";
 import { markdownify } from "@/lib/utils/textConverter";
+import { tinaField } from "@tinacms/astro";
 
-const { content } = Astro.props;
+const locale = Astro.currentLocale || "de";
+
+const { content, tinaFieldPath, parentData } = Astro.props;
 
 const defaultData = await getListPage("clientsSection", `${locale}/clients`);
+if (!defaultData && !content) return null;
+
 const sectionData = {
   data: {
-    ...defaultData.data,
-    ...(content || {})
-  }
+    ...(defaultData?.data ?? {}),
+    ...(content || {}),
+  },
 };
 
 if(!sectionData.data.enable){
@@ -29,6 +33,7 @@ const { paragraph, logos } = sectionData.data;
           <p
             class="w-full pb-3 text-center font-medium tracking-wide sm:pb-0 text-lg"
             set:html={markdownify(paragraph)}
+            data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.paragraph`) : undefined}
           />
         </div>
       </div>
@@ -36,8 +41,8 @@ const { paragraph, logos } = sectionData.data;
         <div
           class="flex justify-center gap-x-12 gap-y-6 grayscale opacity-50 max-lg:flex-wrap">
           {
-            logos?.map((logo: any) => (
-              <div class="flex aspect-[3.125/1] w-36 items-center">
+            logos?.map((logo: any, index: number) => (
+              <div class="flex aspect-[3.125/1] w-36 items-center" data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.logos.${index}`) : undefined}>
                 <Image src={logo.image} alt="brand logo" title="brand logo" width={150} height={120} />
               </div>
             ))

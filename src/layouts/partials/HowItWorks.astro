@@ -1,10 +1,12 @@
 ---
 import ImageMod from "@/components/ImageMod.astro";
-import DynamicIcon from "@/helpers/DynamicIcon";
-const locale = Astro.currentLocale || "de";
+import DynamicIcon from "@/helpers/DynamicIcon.astro";
 import { getListPage } from "@/lib/contentParser.astro";
 import { markdownify } from "@/lib/utils/textConverter";
 import { getRelativeLocaleUrl } from "astro:i18n";
+import { tinaField } from "@tinacms/astro";
+
+const locale = Astro.currentLocale || "de";
 
 const getLocaleUrl = (url: string) => {
   if (!url) return "";
@@ -12,7 +14,7 @@ const getLocaleUrl = (url: string) => {
     ? url
     : getRelativeLocaleUrl(locale, url.startsWith("/") ? url : `/${url}`);
 };
-const { content } = Astro.props;
+const { content, tinaFieldPath, parentData } = Astro.props;
 let sectionData;
 if (content) {
   sectionData = {
@@ -31,10 +33,12 @@ if (content) {
     }
   };
 } else {
-  sectionData = await getListPage("howItWorksSection", `${locale}/how-it-works`);
+  const defaultData = await getListPage("howItWorksSection", `${locale}/how-it-works`);
+  if (!defaultData) return null;
+  sectionData = defaultData;
 }
 
-if(!sectionData.data.enable){
+if (!sectionData?.data?.enable) {
   return null;
 }
 
@@ -50,13 +54,14 @@ const { title, subtitle, description, list, button } = sectionData.data as any;
             <p
               class="mb-2 text-tertiary font-medium"
               set:html={markdownify(subtitle)}
+              data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.subtitle`) : undefined}
             />
           )
         }
-        {title && <h2 class="mb-6" set:html={markdownify(title)} />}
+        {title && <h2 class="mb-6" set:html={markdownify(title)} data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.title`) : undefined} />}
         {
           description && (
-            <p class="text-lg/[inherit]" set:html={markdownify(description)} />
+            <p class="text-lg/[inherit]" set:html={markdownify(description)} data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.description`) : undefined} />
           )
         }
       </div>
@@ -67,7 +72,8 @@ const { title, subtitle, description, list, button } = sectionData.data as any;
               <div
                 class="md:col-6 lg:col-4"
                 data-aos="fade-up-sm"
-                data-aos-delay={index * 100}>
+                data-aos-delay={index * 100}
+                data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.list.${index}`) : undefined}>
                 <div class="min-h-full rounded-xl bg-light px-6 py-12 text-center md:rounded-3xl">
                   {(item.icon || item.index !== undefined) && (
                     <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-tertiary text-text-light font-bold">
@@ -79,6 +85,7 @@ const { title, subtitle, description, list, button } = sectionData.data as any;
                           src={item.icon}
                           alt={`icon related to ${item.title}`}
                           title={`icon related to ${item.title}`}
+                          data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.list.${index}.icon`) : undefined}
                         />
                       ) : (
                         <span>{item.index + 1}</span>
@@ -86,10 +93,10 @@ const { title, subtitle, description, list, button } = sectionData.data as any;
                     </div>
                   )}
                   {item.title && (
-                    <h3 class="h5 mb-2" set:html={markdownify(item.title)} />
+                    <h3 class="h5 mb-2" set:html={markdownify(item.title)} data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.list.${index}.title`) : undefined} />
                   )}
                   {item.description && (
-                    <p set:html={markdownify(item.description)} />
+                    <p set:html={markdownify(item.description)} data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.list.${index}.description`) : undefined} />
                   )}
                 </div>
               </div>
@@ -99,7 +106,7 @@ const { title, subtitle, description, list, button } = sectionData.data as any;
         {
           button?.enable && (
             <div class="text-center mt-12" data-aos="fade-up-sm">
-              <a class="btn btn-primary" href={getLocaleUrl(button.link)} title={button.label}>
+              <a class="btn btn-primary" href={getLocaleUrl(button.link)} title={button.label} data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.button`) : undefined}>
                 {button.label}
                 <span class="icon-wrapper">
                   <span class="icon">

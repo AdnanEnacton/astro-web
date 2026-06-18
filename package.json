@@ -8,8 +8,10 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
+    "dev": "tinacms dev -c \"astro dev\"",
+    "dev:kill": "powershell -NoProfile -Command \"netstat -ano | Select-String ':9000 |:4001 |:4321 ' | ForEach-Object { $p = ($_ -split '\\s+')[-1]; if ($p -match '^\\d+$') { taskkill /F /PID $p 2>$null } }\"",
+    "dev:fresh": "npm run dev:kill && npm run dev",
+    "build": "tinacms build && astro build",
     "preview": "astro preview",
     "check": "astro check",
     "format": "prettier -w ./src",
@@ -19,6 +21,7 @@
   "dependencies": {
     "@astrojs/check": "0.9.7",
     "@astrojs/mdx": "5.0.0",
+    "@astrojs/node": "^10.0.0",
     "@astrojs/react": "5.0.0",
     "@astrojs/sitemap": "3.7.1",
     "@digi4care/astro-google-tagmanager": "^1.6.0",

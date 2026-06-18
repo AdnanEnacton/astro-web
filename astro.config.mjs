@@ -6,12 +6,16 @@ import AutoImport from "astro-auto-import";
 import { defineConfig, fontProviders, sharpImageService } from "astro/config";
 import config from "./src/config/config.json";
 import tina from "@tinacms/astro/integration";
+import node from "@astrojs/node";
+import { tinaAdminDevRedirect } from "@tinacms/astro/vite";
 
 // https://astro.build/config
 export default defineConfig({
+  output: "static",
+  adapter: node({ mode: "standalone" }),
   site: config.site.base_url ? config.site.base_url : "http://examplesite.com",
   base: config.site.base_path ? config.site.base_path : "/",
-  trailingSlash: config.site.trailing_slash ? "always" : "never",
+  trailingSlash: "ignore",
   i18n: {
     defaultLocale: "de",
     locales: ["de", "en"],
@@ -20,7 +24,12 @@ export default defineConfig({
     },
   },
   image: { service: sharpImageService() },
-  vite: { plugins: [tailwindcss()] },
+  vite: {
+    plugins: [tailwindcss(), tinaAdminDevRedirect()],
+    ssr: {
+      noExternal: ["@tinacms/astro", "@tinacms/bridge"],
+    },
+  },
   fonts: [
     {
       provider: fontProviders.fontsource(),

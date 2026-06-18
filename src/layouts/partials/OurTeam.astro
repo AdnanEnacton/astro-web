@@ -1,13 +1,16 @@
 ---
 import ImageMod from "@/components/ImageMod.astro";
-const locale = Astro.currentLocale || "de";
 import { getListPage } from "@/lib/contentParser.astro";
 import { markdownify } from "@/lib/utils/textConverter";
+import { tinaField } from "@tinacms/astro";
 
-const { content } = Astro.props;
+const locale = Astro.currentLocale || "de";
+const { content, tinaFieldPath, parentData } = Astro.props;
 
-const sectionData = content ? { data: content } : await getListPage("ourTeamSection", `${locale}/our-team`);
-if(!sectionData.data.enable){
+const sectionData = content
+  ? { data: content }
+  : await getListPage("ourTeamSection", `${locale}/our-team`);
+if (!sectionData?.data?.enable) {
   return null;
 }
 const { title, subtitle, description, list } = sectionData.data;
@@ -22,23 +25,24 @@ const { title, subtitle, description, list } = sectionData.data;
             <p
               class="mb-2 font-medium text-tertiary"
               set:html={markdownify(subtitle)}
+              data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.subtitle`) : undefined}
             />
           )
         }
-        {title && <h2 class="mb-6" set:html={markdownify(title)} />}
+        {title && <h2 class="mb-6" set:html={markdownify(title)} data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.title`) : undefined} />}
         {
           description && (
-            <p class="text-lg/[inherit]" set:html={markdownify(description)} />
+            <p class="text-lg/[inherit]" set:html={markdownify(description)} data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.description`) : undefined} />
           )
         }
       </div>
       <div class="col-12 pt-20" data-aos="fade-up-sm" data-aos-delay="200">
         <div class="row g-4 justify-center">
           {
-            list?.map((item: any) => (
-              <div class="col-6 lg:col-3">
+            list?.map((item: any, index: number) => (
+              <div class="col-6 lg:col-3" data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.list.${index}`) : undefined}>
                 {item.image && (
-                  <div class="mb-6 overflow-hidden rounded-xl bg-light text-center md:rounded-3xl">
+                  <div class="mb-6 overflow-hidden rounded-xl bg-light text-center md:rounded-3xl" data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.list.${index}.image`) : undefined}>
                     <ImageMod
                       class="w-full"
                       src={item.image}
@@ -48,9 +52,9 @@ const { title, subtitle, description, list } = sectionData.data;
                   </div>
                 )}
                 {item.name && (
-                  <h3 class="h6 mb-1.5" set:html={markdownify(item.name)} />
+                  <h3 class="h6 mb-1.5" set:html={markdownify(item.name)} data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.list.${index}.name`) : undefined} />
                 )}
-                {item.company && <p set:html={markdownify(item.company)} />}
+                {item.company && <p set:html={markdownify(item.company)} data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.list.${index}.company`) : undefined} />}
               </div>
             ))
           }

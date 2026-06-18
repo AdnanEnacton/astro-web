@@ -24,6 +24,8 @@ const {
   canonical,
   banner,
   bannerData,
+  bannerTinaPath,
+  parentData,
   schema,
 } = Astro.props;
 ---
@@ -157,6 +159,8 @@ const {
     <Header
       banner={banner !== undefined ? banner : Astro.url.pathname === "/"}
       bannerData={bannerData}
+      bannerTinaPath={bannerTinaPath}
+      parentData={parentData}
       errorPage={notFoundPage}
     />
     <main

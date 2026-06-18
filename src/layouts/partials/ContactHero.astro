@@ -1,15 +1,16 @@
 ---
 import ImageMod from "@/components/ImageMod.astro";
-const locale = Astro.currentLocale || "de";
 import { getListPage } from "@/lib/contentParser.astro";
 import { markdownify } from "@/lib/utils/textConverter";
 import { useTranslations } from "@/i18n/ui";
+import { tinaField } from "@tinacms/astro";
 
+const locale = Astro.currentLocale || "de";
 const contact_form_action = import.meta.env.PUBLIC_PONTORA_API_URL + "/api/contact-submission";
 // reCAPTCHA v3 site key — public key, safe to embed. Falls back to env var if set.
 const recaptchaSiteKey = import.meta.env.PUBLIC_RECAPTCHA_SITE_KEY || "6Lei1yEtAAAAADxPPV0Ia01VolVebVvc6p13rAme";
 
-const { content } = Astro.props;
+const { content, tinaFieldPath, parentData } = Astro.props;
 
 let hero;
 if (content) {
@@ -45,12 +46,13 @@ const translations = {
             <p
               class="mb-2 font-medium text-tertiary"
               set:html={markdownify(hero.subtitle)}
+              data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, tinaFieldPath + ".subtitle") : undefined}
             />
           )
         }
         {
           hero.title && (
-            <h2 class="md:h1 mb-6" set:html={markdownify(hero.title)} />
+            <h2 class="md:h1 mb-6" set:html={markdownify(hero.title)} data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, tinaFieldPath + ".title") : undefined} />
           )
         }
         {
@@ -58,16 +60,17 @@ const translations = {
             <p
               class="text-lg/[inherit]"
               set:html={markdownify(hero.description)}
+              data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, tinaFieldPath + ".description") : undefined}
             />
           )
         }
         {
           hero.list && (
             <div class="mt-10 flex flex-col gap-10 sm:flex-row xl:mt-20">
-              {hero.list.map((point: any) => (
-                <div>
+              {hero.list.map((point: any, index: number) => (
+                <div data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, tinaFieldPath + ".list." + index) : undefined}>
                   {point.icon && (
-                    <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-tertiary">
+                    <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-tertiary" data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, tinaFieldPath + ".list." + index + ".icon") : undefined}>
                       <ImageMod
                         class="h-6 w-6 object-cover"
                         src={point.icon}
@@ -80,12 +83,14 @@ const translations = {
                     <h3
                       class="h6 mb-2 mt-5"
                       set:html={markdownify(point.title)}
+                      data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, tinaFieldPath + ".list." + index + ".title") : undefined}
                     />
                   )}
                   {point.description && (
                     <p
                       class="text-lg/[inherit]"
                       set:html={markdownify(point.description)}
+                      data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, tinaFieldPath + ".list." + index + ".description") : undefined}
                     />
                   )}
                 </div>

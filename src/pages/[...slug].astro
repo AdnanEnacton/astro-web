@@ -9,6 +9,10 @@ import { useTranslations } from "@/i18n/ui";
 import { render } from "astro:content";
 import dayjs from "dayjs";
 import TinaIsland from "@tinacms/astro/TinaIsland.astro";
+import type { CollectionKey } from "astro:content";
+import { resolvePageData } from "@/lib/tina/data";
+import { getSectionTemplate } from "@/lib/tina/sections";
+import { islands } from "@/lib/tina/islands";
 
 export async function getStaticPaths() {
   const homepage = await getSinglePage("homepage");
@@ -52,7 +56,13 @@ export async function getStaticPaths() {
 }
 
 const { page, type, locale } = Astro.props;
-const data = page.data as any;
+
+const { data } = await resolvePageData<Record<string, any>>(
+  page.id,
+  type as CollectionKey,
+  page.data as Record<string, any>,
+  { priority: "primary" }
+);
 
 // Page rendering helpers for regular markdown pages
 let Content = null;
@@ -69,8 +79,14 @@ if (type === "pages") {
 // Blog posts loading (only if blog_section or pagination is configured)
 let posts: any[] = [];
 let totalPages = 0;
-const hasBlogSection = data.blog_section || data.pagination || 
-  (data.sections && data.sections.some((s: any) => s._template === "blog_section" || s._template === "pagination"));
+const hasBlogSection =
+  data.blog_section ||
+  data.pagination ||
+  (data.sections &&
+    data.sections.some((s: any) => {
+      const template = getSectionTemplate(s);
+      return template === "blog_section" || template === "pagination";
+    }));
 
 if (hasBlogSection) {
   posts = (await getSinglePage("blog")).filter((post) =>
@@ -83,8 +99,14 @@ if (hasBlogSection) {
 let bannerSection = null;
 let homeSchema = undefined;
 
+let bannerIndex = -1;
 if (data.sections) {
-  bannerSection = data.sections.find((s: any) => s._template === "banner");
+  bannerSection = data.sections.find(
+    (s: any) => getSectionTemplate(s) === "banner"
+  );
+  bannerIndex = data.sections.findIndex(
+    (s: any) => getSectionTemplate(s) === "banner"
+  );
 }
 
 if (!bannerSection && type === "homepage") {
@@ -120,9 +142,10 @@ if (type === "homepage") {
   keywords={data.keywords}
   banner={bannerSection ? bannerSection.enable !== false : undefined}
   bannerData={bannerSection}
+  bannerTinaPath={bannerIndex !== -1 ? `sections.${bannerIndex}` : undefined}
+  parentData={data}
   schema={type === "homepage" ? homeSchema : undefined}
 >
-  {/* Render standard generic markdown page */}
   {type === "pages" ? (
     <>
       <PageHeader title={data.title} lastModified={lastModified} />
@@ -140,14 +163,13 @@ if (type === "homepage") {
       <CallToAction />
     </>
   ) : (
-    /* Render modular section list */
     <TinaIsland
       name="page-layout"
-      wrapper={{ tag: "main" }}
+      wrapper={islands["page-layout"].wrapper}
       params={{ slug: page.id, locale, type }}
-      primary={true}
+      primary
     >
-      <PageSections data={data} posts={posts} totalPages={totalPages} type={type} />
+      <PageSections data={data} posts={posts} totalPages={totalPages} type={type} locale={locale} />
     </TinaIsland>
   )}
 

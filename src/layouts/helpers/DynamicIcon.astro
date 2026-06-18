@@ -1,0 +1,35 @@
+---
+import { createElement, type SVGProps } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import type { IconType } from "react-icons";
+import * as FaIcons from "react-icons/fa6";
+import * as CiIcons from "react-icons/ci";
+
+interface Props {
+  icon: string;
+  className?: string;
+}
+
+const { icon, className } = Astro.props;
+
+const iconLibraries: Record<string, Record<string, IconType>> = {
+  fa: FaIcons,
+  ci: CiIcons,
+};
+
+const cleanIconName = icon.includes(":") ? icon.split(":")[1] : icon;
+const libraryKey = icon.includes(":")
+  ? icon.split(":")[0].toLowerCase()
+  : icon.substring(0, 2).toLowerCase();
+
+const IconLibrary = iconLibraries[libraryKey];
+const IconComponent = IconLibrary?.[cleanIconName];
+
+const html = IconComponent
+  ? renderToStaticMarkup(
+      createElement(IconComponent, { className } as SVGProps<SVGSVGElement>)
+    )
+  : '<span class="text-sm">Icon not found</span>';
+---
+
+<Fragment set:html={html} />

@@ -434,6 +434,23 @@ var config_default = defineConfig({
           allowedActions: {
             create: false,
             delete: false
+          },
+          router: ({ document }) => {
+            const path = document._sys.relativePath;
+            const cleanPath = path.replace(/\.(mdx|md)$/, "");
+            if (cleanPath === "de/home") {
+              return "/";
+            }
+            if (cleanPath === "en/home") {
+              return "/en/";
+            }
+            if (cleanPath.startsWith("de/")) {
+              return `/${cleanPath.slice(3)}/`;
+            }
+            if (cleanPath.startsWith("en/")) {
+              return `/${cleanPath}/`;
+            }
+            return void 0;
           }
         },
         templates: [
@@ -482,6 +499,19 @@ var config_default = defineConfig({
         label: "Blog Posts",
         path: "src/content/blog",
         format: "md",
+        ui: {
+          router: ({ document }) => {
+            const path = document._sys.relativePath;
+            const cleanPath = path.replace(/\.(mdx|md)$/, "");
+            if (cleanPath.startsWith("de/")) {
+              return `/blog/${cleanPath.slice(3)}/`;
+            }
+            if (cleanPath.startsWith("en/")) {
+              return `/en/blog/${cleanPath.slice(3)}/`;
+            }
+            return void 0;
+          }
+        },
         fields: [
           ...commonFields,
           { type: "string", name: "author", label: "Author Name" },
@@ -769,6 +799,13 @@ var config_default = defineConfig({
           allowedActions: {
             create: false,
             delete: false
+          },
+          router: ({ document }) => {
+            const path = document._sys.relativePath;
+            if (path.startsWith("en/")) {
+              return "/en/pricing/";
+            }
+            return "/pricing/";
           }
         },
         match: {
@@ -806,6 +843,13 @@ var config_default = defineConfig({
           allowedActions: {
             create: false,
             delete: false
+          },
+          router: ({ document }) => {
+            const path = document._sys.relativePath;
+            if (path.startsWith("en/")) {
+              return "/en/pricing/";
+            }
+            return "/pricing/";
           }
         },
         match: {

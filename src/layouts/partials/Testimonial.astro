@@ -1,14 +1,25 @@
 ---
 import ImageMod from "@/components/ImageMod.astro";
-import DynamicIcon from "@/helpers/DynamicIcon";
-const locale = Astro.currentLocale || "de";
+import DynamicIcon from "@/helpers/DynamicIcon.astro";
 import { getListPage } from "@/lib/contentParser.astro";
 import { markdownify } from "@/lib/utils/textConverter";
+import { tinaField } from "@tinacms/astro";
 
-const { content, visible_testimonial, largeHeading } = Astro.props;
+const locale = Astro.currentLocale || "de";
 
-const sectionData = await getListPage("testimonial", `${locale}/-index`);
-if (!sectionData.data.enable){
+const { content, visible_testimonial, largeHeading, tinaFieldPath, parentData } = Astro.props;
+
+const defaultData = await getListPage("testimonial", `${locale}/-index`);
+if (!defaultData && !content) return null;
+
+const sectionData = {
+  data: {
+    ...(defaultData?.data ?? {}),
+    ...(content || {}),
+  },
+};
+
+if (!sectionData.data.enable) {
   return null;
 }
 
@@ -33,6 +44,7 @@ if (visible_testimonial) {
             <p
               class="mb-2 font-medium text-tertiary"
               set:html={markdownify(subtitle)}
+              data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.subtitle`) : undefined}
             />
           )
         }
@@ -40,14 +52,14 @@ if (visible_testimonial) {
         {
           title &&
             (largeHeading ? (
-              <h1 class="h2 md:h1 mb-6" set:html={markdownify(title)} />
+              <h1 class="h2 md:h1 mb-6" set:html={markdownify(title)} data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.title`) : undefined} />
             ) : (
-              <h2 class="mb-6" set:html={markdownify(title)} />
+              <h2 class="mb-6" set:html={markdownify(title)} data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.title`) : undefined} />
             ))
         }
         {
           description && (
-            <p class="text-lg/[inherit]" set:html={markdownify(description)} />
+            <p class="text-lg/[inherit]" set:html={markdownify(description)} data-tina-field={parentData && tinaFieldPath ? tinaField(parentData, `${tinaFieldPath}.description`) : undefined} />
           )
         }
       </div>

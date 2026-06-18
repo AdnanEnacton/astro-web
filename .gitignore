@@ -23,3 +23,7 @@ package-lock.json
 
 # ignore .astro directory
 .astro
+
+# Cursor / agent session artifacts
+terminals/
+agent-tools/
