@@ -1,26 +1,14 @@
 ---
 import Base from "@/layouts/Base.astro";
 import { getSinglePage } from "@/lib/contentParser.astro";
-import AboutBanner from "@/partials/AboutBanner.astro";
-import CallToAction from "@/partials/CallToAction.astro";
-import Clients from "@/partials/Clients.astro";
-import Faq from "@/partials/Faq.astro";
-import OurTeam from "@/partials/OurTeam.astro";
-import OurValues from "@/partials/OurValues.astro";
-import HowItWorks from "@/partials/HowItWorks.astro";
-import FeaturesGrid from "@/partials/FeaturesGrid.astro";
-import FeatureSection from "@/partials/FeatureSection.astro";
-import FeaturesExplanation from "@/partials/FeaturesExplanation.astro";
-import PricingSection from "@/partials/PricingSection.astro";
-import Testimonial from "@/partials/Testimonial.astro";
-import ContactHero from "@/partials/ContactHero.astro";
 import PageHeader from "@/partials/PageHeader.astro";
-import BlogSection from "@/partials/BlogSection.astro";
-import Pagination from "@/components/Pagination.astro";
+import PageSections from "@/partials/PageSections.astro";
+import CallToAction from "@/partials/CallToAction.astro";
 import config from "@/config/config.json";
 import { useTranslations } from "@/i18n/ui";
 import { render } from "astro:content";
 import dayjs from "dayjs";
+import TinaIsland from "@tinacms/astro/TinaIsland.astro";
 
 export async function getStaticPaths() {
   const homepage = await getSinglePage("homepage");
@@ -82,7 +70,7 @@ if (type === "pages") {
 let posts: any[] = [];
 let totalPages = 0;
 const hasBlogSection = data.blog_section || data.pagination || 
-  (data.sections && data.sections.some((s: any) => s.type === "blog_section" || s.type === "pagination"));
+  (data.sections && data.sections.some((s: any) => s._template === "blog_section" || s._template === "pagination"));
 
 if (hasBlogSection) {
   posts = (await getSinglePage("blog")).filter((post) =>
@@ -96,7 +84,7 @@ let bannerSection = null;
 let homeSchema = undefined;
 
 if (data.sections) {
-  bannerSection = data.sections.find((s: any) => s.type === "banner");
+  bannerSection = data.sections.find((s: any) => s._template === "banner");
 }
 
 if (!bannerSection && type === "homepage") {
@@ -153,98 +141,14 @@ if (type === "homepage") {
     </>
   ) : (
     /* Render modular section list */
-    data.sections &&
-    data.sections.map((section: any) => {
-      if (section.enable === false) return null;
-
-      return (
-        <>
-          {/* Banner Section (Handled by Layout Header, return null in body) */}
-          {section.type === "banner" && null}
-
-          {/* About Banner Section */}
-          {section.type === "about_banner" && (
-            <AboutBanner content={section} />
-          )}
-
-          {/* Contact Hero Section */}
-          {section.type === "contact_hero" && (
-            <ContactHero content={section} />
-          )}
-
-          {/* Clients Section */}
-          {section.type === "clients" && (
-            <Clients content={section} />
-          )}
-
-          {/* Our Values Section */}
-          {section.type === "our_values" && (
-            <OurValues content={section} />
-          )}
-
-          {/* Our Team Section */}
-          {section.type === "our_team" && (
-            <OurTeam content={section} />
-          )}
-
-          {/* How It Works Section */}
-          {section.type === "how_it_works" && (
-            <HowItWorks content={section} />
-          )}
-
-          {/* Features Grid Section */}
-          {section.type === "features_grid" && (
-            <FeaturesGrid content={section} largeHeading={type === "features"} />
-          )}
-
-          {/* Features Section */}
-          {section.type === "features_section" && (
-            <FeatureSection content={section} />
-          )}
-
-          {/* Features Explanation Section */}
-          {section.type === "features_explanation" && (
-            <FeaturesExplanation content={section} />
-          )}
-
-          {/* Pricing Section */}
-          {section.type === "pricing" && (
-            <PricingSection content={section} largeHeading={type === "pricing"} />
-          )}
-
-          {/* Testimonial Section */}
-          {section.type === "testimonial" && (
-            <Testimonial content={section} visible_testimonial={3} />
-          )}
-
-          {/* Blog Section */}
-          {section.type === "blog_section" && (
-            <BlogSection
-              largeHeading={section.large_heading}
-              content={section}
-              visiblePosts={section.visible_posts}
-              cardLayout={section.card_layout}
-              posts={posts}
-            />
-          )}
-
-          {/* Pagination */}
-          {section.type === "pagination" && (
-            <Pagination section="blog" totalPages={totalPages} />
-          )}
-
-          {/* FAQ Section */}
-          {section.type === "faq" && (
-            <Faq content={section} />
-          )}
-
-          {/* CTA Section */}
-          {section.type === "page_cta" && (
-            <CallToAction content={section} />
-          )}
-        </>
-      );
-    })
+    <TinaIsland
+      name="page-layout"
+      wrapper={{ tag: "main" }}
+      params={{ slug: page.id, locale, type }}
+      primary={true}
+    >
+      <PageSections data={data} posts={posts} totalPages={totalPages} type={type} />
+    </TinaIsland>
   )}
 
 </Base>

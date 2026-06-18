@@ -23,7 +23,7 @@ export const pages = defineCollection({
 });
 
 const bannerSchema = z.object({
-  type: z.literal("banner"),
+  _template: z.literal("banner"),
   enable: z.boolean().optional(),
   title: z.string(),
   content: z.string(),
@@ -45,7 +45,7 @@ const bannerSchema = z.object({
 });
 
 const clientsSchema = z.object({
-  type: z.literal("clients"),
+  _template: z.literal("clients"),
   enable: z.boolean(),
   paragraph: z.string().optional(),
   logos: z.array(z.object({
@@ -54,7 +54,7 @@ const clientsSchema = z.object({
 });
 
 const howItWorksSchema = z.object({
-  type: z.literal("how_it_works"),
+  _template: z.literal("how_it_works"),
   enable: z.boolean(),
   subtitle: z.string().optional(),
   title: z.string(),
@@ -69,7 +69,7 @@ const howItWorksSchema = z.object({
 });
 
 const featuresGridSchema = z.object({
-  type: z.literal("features_grid"),
+  _template: z.literal("features_grid"),
   enable: z.boolean(),
   subtitle: z.string().optional(),
   title: z.string(),
@@ -89,7 +89,7 @@ const featuresGridSchema = z.object({
 });
 
 const featuresSectionSchema = z.object({
-  type: z.literal("features_section"),
+  _template: z.literal("features_section"),
   enable: z.boolean(),
   subtitle: z.string().optional(),
   title: z.string(),
@@ -116,7 +116,7 @@ const featuresSectionSchema = z.object({
 });
 
 const featuresExplanationSchema = z.object({
-  type: z.literal("features_explanation"),
+  _template: z.literal("features_explanation"),
   enable: z.boolean(),
   subtitle: z.string().optional(),
   title: z.string(),
@@ -135,7 +135,7 @@ const featuresExplanationSchema = z.object({
 });
 
 const pricingSchema = z.object({
-  type: z.literal("pricing"),
+  _template: z.literal("pricing"),
   enable: z.boolean(),
   subtitle: z.string().optional(),
   title: z.string(),
@@ -166,17 +166,17 @@ const pricingSchema = z.object({
 
 
 const testimonialSchema = z.object({
-  type: z.literal("testimonial"),
+  _template: z.literal("testimonial"),
   enable: z.boolean(),
 });
 
 const faqSchema = z.object({
-  type: z.literal("faq"),
+  _template: z.literal("faq"),
   enable: z.boolean(),
 });
 
 const pageCtaSchema = z.object({
-  type: z.literal("page_cta"),
+  _template: z.literal("page_cta"),
   enable: z.boolean(),
   title: z.string(),
   description: z.string(),
@@ -189,7 +189,7 @@ const pageCtaSchema = z.object({
 });
 
 const aboutBannerSchema = z.object({
-  type: z.literal("about_banner"),
+  _template: z.literal("about_banner"),
   enable: z.boolean().optional(),
   title: z.string(),
   subtitle: z.string().optional(),
@@ -205,7 +205,7 @@ const aboutBannerSchema = z.object({
 });
 
 const ourValuesSchema = z.object({
-  type: z.literal("our_values"),
+  _template: z.literal("our_values"),
   enable: z.boolean().optional(),
   title: z.string(),
   subtitle: z.string().optional(),
@@ -226,7 +226,7 @@ const ourValuesSchema = z.object({
 });
 
 const ourTeamSchema = z.object({
-  type: z.literal("our_team"),
+  _template: z.literal("our_team"),
   enable: z.boolean().optional(),
   title: z.string(),
   subtitle: z.string().optional(),
@@ -241,7 +241,7 @@ const ourTeamSchema = z.object({
 });
 
 const contactHeroSchema = z.object({
-  type: z.literal("contact_hero"),
+  _template: z.literal("contact_hero"),
   enable: z.boolean().optional(),
   title: z.string(),
   subtitle: z.string().optional(),
@@ -256,7 +256,7 @@ const contactHeroSchema = z.object({
 });
 
 const blogSectionSchema = z.object({
-  type: z.literal("blog_section"),
+  _template: z.literal("blog_section"),
   enable: z.boolean().optional(),
   title: z.string().optional(),
   subtitle: z.string().optional(),
@@ -267,16 +267,16 @@ const blogSectionSchema = z.object({
 });
 
 const paginationSchema = z.object({
-  type: z.literal("pagination"),
+  _template: z.literal("pagination"),
   enable: z.boolean().optional(),
 });
 
 const blogSingleContentSchema = z.object({
-  type: z.literal("blog_single_content"),
+  _template: z.literal("blog_single_content"),
   enable: z.boolean().optional(),
 });
 
-const sectionSchema = z.discriminatedUnion("type", [
+const sectionSchema = z.discriminatedUnion("_template", [
   bannerSchema,
   clientsSchema,
   howItWorksSchema,

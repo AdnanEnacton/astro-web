@@ -1,0 +1,113 @@
+---
+import AboutBanner from "@/partials/AboutBanner.astro";
+import CallToAction from "@/partials/CallToAction.astro";
+import Clients from "@/partials/Clients.astro";
+import Faq from "@/partials/Faq.astro";
+import OurTeam from "@/partials/OurTeam.astro";
+import OurValues from "@/partials/OurValues.astro";
+import HowItWorks from "@/partials/HowItWorks.astro";
+import FeaturesGrid from "@/partials/FeaturesGrid.astro";
+import FeatureSection from "@/partials/FeatureSection.astro";
+import FeaturesExplanation from "@/partials/FeaturesExplanation.astro";
+import PricingSection from "@/partials/PricingSection.astro";
+import Testimonial from "@/partials/Testimonial.astro";
+import ContactHero from "@/partials/ContactHero.astro";
+import BlogSection from "@/partials/BlogSection.astro";
+import Pagination from "@/components/Pagination.astro";
+import { tinaField } from "@tinacms/astro";
+
+const { data, posts, totalPages, type } = Astro.props;
+---
+
+{data.sections &&
+  data.sections.map((section: any, index: number) => {
+    if (section.enable === false) return null;
+
+    return (
+      <div data-tina-field={tinaField(data, `sections.${index}`)}>
+        {/* Banner Section (Handled by Layout Header, return null in body) */}
+        {section._template === "banner" && null}
+
+        {/* About Banner Section */}
+        {section._template === "about_banner" && (
+          <AboutBanner content={section} />
+        )}
+
+        {/* Contact Hero Section */}
+        {section._template === "contact_hero" && (
+          <ContactHero content={section} />
+        )}
+
+        {/* Clients Section */}
+        {section._template === "clients" && (
+          <Clients content={section} />
+        )}
+
+        {/* Our Values Section */}
+        {section._template === "our_values" && (
+          <OurValues content={section} />
+        )}
+
+        {/* Our Team Section */}
+        {section._template === "our_team" && (
+          <OurTeam content={section} />
+        )}
+
+        {/* How It Works Section */}
+        {section._template === "how_it_works" && (
+          <HowItWorks content={section} />
+        )}
+
+        {/* Features Grid Section */}
+        {section._template === "features_grid" && (
+          <FeaturesGrid content={section} largeHeading={type === "features"} />
+        )}
+
+        {/* Features Section */}
+        {section._template === "features_section" && (
+          <FeatureSection content={section} />
+        )}
+
+        {/* Features Explanation Section */}
+        {section._template === "features_explanation" && (
+          <FeaturesExplanation content={section} />
+        )}
+
+        {/* Pricing Section */}
+        {section._template === "pricing" && (
+          <PricingSection content={section} largeHeading={type === "pricing"} />
+        )}
+
+        {/* Testimonial Section */}
+        {section._template === "testimonial" && (
+          <Testimonial content={section} visible_testimonial={3} />
+        )}
+
+        {/* Blog Section */}
+        {section._template === "blog_section" && (
+          <BlogSection
+            largeHeading={section.large_heading}
+            content={section}
+            visiblePosts={section.visible_posts}
+            cardLayout={section.card_layout}
+            posts={posts}
+          />
+        )}
+
+        {/* Pagination */}
+        {section._template === "pagination" && (
+          <Pagination section="blog" totalPages={totalPages} />
+        )}
+
+        {/* FAQ Section */}
+        {section._template === "faq" && (
+          <Faq content={section} />
+        )}
+
+        {/* CTA Section */}
+        {section._template === "page_cta" && (
+          <CallToAction content={section} />
+        )}
+      </div>
+    );
+  })}

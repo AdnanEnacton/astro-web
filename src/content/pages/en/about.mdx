@@ -1,4 +1,5 @@
 ---
+_template: about
 title: "About Us"
 meta_title: "About"
 description: "Learn more about Pontora and our mission to simplify company operations, employee records, and trustee collaboration."
@@ -6,7 +7,7 @@ image: "/images/avatar.png"
 draft: false
 
 sections:
-  - type: about_banner
+  - _template: about_banner
     enable: true
     title: About Pontora, Our Commitment to Streamlining Operations
     subtitle: About Us
@@ -19,7 +20,7 @@ sections:
       designation: Founder and CEO.
       content: |
         Welcome to Pontora! Our team is dedicated to bringing order, security, and efficiency to day-to-day business operations. In today's digital landscape, modern firms need a unified operating system, not a mess of disconnected spreadsheets and email chains.
-  - type: clients
+  - _template: clients
     enable: true
     paragraph: "Trusted by thousands of companies worldwide"
     logos:
@@ -29,7 +30,7 @@ sections:
       - image: "/images/clients/4.svg"
       - image: "/images/clients/5.svg"
       - image: "/images/clients/6.svg"
-  - type: our_values
+  - _template: our_values
     enable: true
     subtitle: Core Values
     title: Our Values
@@ -51,7 +52,7 @@ sections:
         value: 99.8%
       - label: System Uptime
         value: 99.99%
-  - type: our_team
+  - _template: our_team
     enable: true
     subtitle: Our Team
     title: Meet Our Team
@@ -69,9 +70,9 @@ sections:
       - name: Devon Lane
         image: "/images/team/4.png"
         company: Barone LLC.
-  - type: faq
+  - _template: faq
     enable: true
-  - type: page_cta
+  - _template: page_cta
     enable: true
     title: "Secure Your Operations with Pontora"
     image: "/images/cta-bg.svg"

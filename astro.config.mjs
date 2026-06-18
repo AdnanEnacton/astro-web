@@ -5,6 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 import AutoImport from "astro-auto-import";
 import { defineConfig, fontProviders, sharpImageService } from "astro/config";
 import config from "./src/config/config.json";
+import tina from "@tinacms/astro/integration";
 
 // https://astro.build/config
 export default defineConfig({
@@ -33,6 +34,7 @@ export default defineConfig({
     },
   ],
   integrations: [
+    tina(),
     react(),
     sitemap(),
     AutoImport({
