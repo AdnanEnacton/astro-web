@@ -1,6 +1,6 @@
 import { defineConfig, type TinaField, type Template } from "tinacms";
 
-const branch = process.env.HEAD || process.env.VERCEL_GIT_COMMIT_REF || "main";
+const branch = process.env.HEAD || process.env.VERCEL_GIT_COMMIT_REF || "editor";
 
 // Common button schemas
 const buttonSchema = {

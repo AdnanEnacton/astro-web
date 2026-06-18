@@ -1,6 +1,6 @@
 // tina/config.ts
 import { defineConfig } from "tinacms";
-var branch = process.env.HEAD || process.env.VERCEL_GIT_COMMIT_REF || "main";
+var branch = process.env.HEAD || process.env.VERCEL_GIT_COMMIT_REF || "editor";
 var buttonSchema = {
   type: "object",
   name: "button",
