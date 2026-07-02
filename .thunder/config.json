@@ -19,7 +19,7 @@
     "commitMessageMode": "auto"
   },
   "code": {
-    "root": "src/content/pages"
+    "root": "src"
   },
   "configs": [
     "src/config"
